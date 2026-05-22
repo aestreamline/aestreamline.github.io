@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A.E Streamline | Virtual Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #1c1e21;
+    --off-black: #232629;
+    --white: #f0f2f4;
+    --muted: #8a9099;
+    --accent: #b0bcc8;
+    --border: rgba(176,188,200,0.18);
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'Instrument Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 4rem;
+    background: rgba(28,30,33,0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--white);
+    text-decoration: none;
+  }
+
+  .nav-logo span {
+    color: var(--accent);
+  }
+
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2.5rem;
+  }
+
+  nav ul a {
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  nav ul a:hover { color: var(--white); }
+
+  .nav-cta {
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--black) !important;
+    background: var(--accent);
+    padding: 0.5rem 1.25rem;
+    border-radius: 2px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 8rem 4rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: 'A.E';
+    position: absolute;
+    right: -2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--serif);
+    font-size: 28vw;
+    font-weight: 600;
+    color: rgba(176,188,200,0.04);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .hero-inner { max-width: 780px; }
+
+  .hero-tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 0.5px solid var(--accent);
+    padding: 0.3rem 0.9rem;
+    border-radius: 2px;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.1s forwards;
+  }
+
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--white);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.25s forwards;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.75;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.4s forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.55s forwards;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--black);
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.85rem 2rem;
+    border-radius: 2px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+
+  .btn-secondary {
+    display: inline-block;
+    border: 0.5px solid var(--border);
+    color: var(--muted);
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.85rem 2rem;
+    border-radius: 2px;
+    text-decoration: none;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .btn-secondary:hover { color: var(--white); border-color: var(--muted); }
+
+  /* STATS BAR */
+  .stats {
+    border-top: 0.5px solid var(--border);
+    border-bottom: 0.5px solid var(--border);
+    padding: 2.5rem 4rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .stat { text-align: center; }
+
+  .stat-val {
+    font-family: var(--serif);
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .stat-lbl {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 6rem 4rem;
+  }
+
+  .section-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+
+  .section-title em { font-style: italic; color: var(--accent); }
+
+  /* SERVICES */
+  #services { background: var(--off-black); }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    border: 1px solid var(--border);
+    margin-top: 3.5rem;
+  }
+
+  .service-card {
+    padding: 2.5rem 2rem;
+    border: none;
+    background: var(--off-black);
+    transition: background 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .service-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .service-card:hover { background: #2a2d31; }
+  .service-card:hover::before { transform: scaleX(1); }
+
+  .service-icon {
+    font-size: 1.4rem;
+    margin-bottom: 1.25rem;
+    color: var(--accent);
+    opacity: 0.9;
+  }
+
+  .service-name {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    font-weight: 400;
+    margin-bottom: 0.75rem;
+    color: var(--white);
+  }
+
+  .service-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ABOUT */
+  #about {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+  }
+
+  .about-visual {
+    position: relative;
+  }
+
+  .about-box {
+    background: var(--off-black);
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+    padding: 3rem;
+    text-align: center;
+  }
+
+  .about-initials {
+    font-family: var(--serif);
+    font-size: 6rem;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .about-brand {
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .about-divider {
+    width: 40px;
+    height: 0.5px;
+    background: var(--accent);
+    margin: 1.5rem auto;
+    opacity: 0.5;
+  }
+
+  .about-location {
+    font-size: 0.8rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .about-text p {
+    font-size: 0.95rem;
+    color: var(--muted);
+    line-height: 1.85;
+    margin-bottom: 1.25rem;
+  }
+
+  .about-text p:last-of-type { margin-bottom: 0; }
+
+  .about-text strong { color: var(--white); font-weight: 500; }
+
+  .credentials {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .credential {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.83rem;
+    color: var(--muted);
+  }
+
+  .credential-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-top: 0.45rem;
+    flex-shrink: 0;
+  }
+
+  /* PROCESS */
+  #process { background: var(--off-black); }
+
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+    margin-top: 3.5rem;
+    border: 0.5px solid var(--border);
+  }
+
+  .process-step {
+    padding: 2.5rem 2rem;
+    border-right: 0.5px solid var(--border);
+    position: relative;
+  }
+
+  .process-step:last-child { border-right: none; }
+
+  .step-num {
+    font-family: var(--serif);
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: rgba(176,188,200,0.15);
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .step-title {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    margin-bottom: 0.6rem;
+    color: var(--white);
+  }
+
+  .step-desc {
+    font-size: 0.83rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* CONTACT */
+  #contact {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  #contact .section-title { margin-bottom: 1rem; }
+
+  .contact-sub {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-bottom: 3rem;
+    line-height: 1.7;
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: left;
+    width: 100%;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .contact-form input,
+  .contact-form textarea,
+  .contact-form select {
+    width: 100%;
+    background: var(--off-black);
+    border: 0.5px solid var(--border);
+    border-radius: 2px;
+    padding: 0.9rem 1rem;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    color: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+  }
+
+  .contact-form input::placeholder,
+  .contact-form textarea::placeholder {
+    color: var(--muted);
+  }
+
+  .contact-form input:focus,
+  .contact-form textarea:focus {
+    border-color: var(--accent);
+  }
+
+  .contact-form textarea { resize: vertical; min-height: 130px; }
+
+  .form-submit {
+    background: var(--accent);
+    color: var(--black);
+    border: none;
+    border-radius: 2px;
+    padding: 1rem 2rem;
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    width: 100%;
+  }
+
+  .form-submit:hover { opacity: 0.85; }
+
+  .contact-note {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 1rem;
+    text-align: center;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 0.5px solid var(--border);
+    padding: 2rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-logo {
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--muted);
+  }
+
+  .footer-logo span { color: var(--accent); }
+
+  .footer-note {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    nav { padding: 1.25rem 1.5rem; }
+    nav ul { display: none; }
+    .hero { padding: 7rem 1.5rem 4rem; }
+    .stats { padding: 2rem 1.5rem; grid-template-columns: 1fr; gap: 1.5rem; }
+    section { padding: 4rem 1.5rem; }
+    #about { grid-template-columns: 1fr; gap: 3rem; }
+    .form-row { grid-template-columns: 1fr; }
+    footer { padding: 1.5rem; flex-direction: column; text-align: center; }
+    .hero::after { font-size: 40vw; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">A<span>.</span>E <span style="color:var(--muted); font-weight:300">Streamline</span></a>
+  <ul>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#contact" class="nav-cta">Hire me</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div class="hero-tag">UK-Based Virtual Assistant</div>
+    <h1>Your operations,<br><em>streamlined.</em></h1>
+    <p class="hero-sub">I handle the admin, emails, invoicing, and scheduling that slow you down — so you can focus on growing your business. Detail-first, reliable, and always one step ahead.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">Work with me</a>
+      <a href="#services" class="btn-secondary">See services</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat fade-in">
+    <div class="stat-val">20+</div>
+    <div class="stat-lbl">Hours available weekly</div>
+  </div>
+  <div class="stat fade-in">
+    <div class="stat-val">£15</div>
+    <div class="stat-lbl">Starting hourly rate</div>
+  </div>
+  <div class="stat fade-in">
+    <div class="stat-val">24h</div>
+    <div class="stat-lbl">Response guarantee</div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-label">What I do</div>
+  <h2 class="section-title fade-in">Services built for<br><em>busy founders</em></h2>
+  <div class="services-grid">
+    <div class="service-card fade-in">
+      <div class="service-icon"><i class="ti ti-mail" aria-hidden="true"></i></div>
+      <div class="service-name">Inbox Management</div>
+      <p class="service-desc">Email triage, filtering, drafting replies, and keeping your inbox at zero so nothing important slips through.</p>
+    </div>
+    <div class="service-card fade-in">
+      <div class="service-icon"><i class="ti ti-calendar" aria-hidden="true"></i></div>
+      <div class="service-name">Calendar & Scheduling</div>
+      <p class="service-desc">Meeting coordination, appointment booking, and diary management so your time is protected.</p>
+    </div>
+    <div class="service-card fade-in">
+      <div class="service-icon"><i class="ti ti-receipt" aria-hidden="true"></i></div>
+      <div class="service-name">Invoice & Admin Support</div>
+      <p class="service-desc">Invoice reviewing, data entry, record keeping, and document management with a detail-first approach.</p>
+    </div>
+    <div class="service-card fade-in">
+      <div class="service-icon"><i class="ti ti-search" aria-hidden="true"></i></div>
+      <div class="service-name">Research & Data Entry</div>
+      <p class="service-desc">Internet research, competitor analysis, list building, and data entry — accurate and delivered on time.</p>
+    </div>
+    <div class="service-card fade-in">
+      <div class="service-icon"><i class="ti ti-message-circle" aria-hidden="true"></i></div>
+      <div class="service-name">Customer Communication</div>
+      <p class="service-desc">Handling customer emails and enquiries professionally, maintaining your brand voice throughout.</p>
+    </div>
+    <div class="service-card fade-in">
+      <div class="service-icon"><i class="ti ti-file-text" aria-hidden="true"></i></div>
+      <div class="service-name">Document Support</div>
+      <p class="service-desc">Formatting, proofreading, and organising documents, reports, and presentations to a high standard.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-visual fade-in">
+    <div class="about-box">
+      <div class="about-initials">A.E</div>
+      <div class="about-brand">Streamline</div>
+      <div class="about-divider"></div>
+      <div class="about-location">United Kingdom &mdash; Remote</div>
+    </div>
+  </div>
+  <div class="about-text">
+    <div class="section-label">About</div>
+    <h2 class="section-title fade-in">Organised by nature,<br><em>reliable by habit.</em></h2>
+    <p>I'm a UK-based virtual assistant with a background in pharmaceutical administration, where I reviewed supplier invoices and managed regulated documentation in a fast-paced healthcare environment. That work taught me that accuracy isn't optional — and I bring the same standard to every client.</p>
+    <p>I'm currently studying <strong>Forensic Psychology with the Open University</strong>, which means I work independently, meet deadlines without being chased, and analyse information carefully before acting on it.</p>
+    <div class="credentials fade-in">
+      <div class="credential"><div class="credential-dot"></div><span>BSc Forensic Psychology — The Open University (in progress)</span></div>
+      <div class="credential"><div class="credential-dot"></div><span>NVQ Level 2 — Pharmaceutical Customer &amp; Counter Service (Distinction in knowledge assessment)</span></div>
+      <div class="credential"><div class="credential-dot"></div><span>GCSE English Language — Grade 7 (A)</span></div>
+      <div class="credential"><div class="credential-dot"></div><span>15-month formal apprenticeship in a regulated healthcare setting</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="section-label">How it works</div>
+  <h2 class="section-title fade-in">From first message<br><em>to first task done.</em></h2>
+  <div class="process-steps">
+    <div class="process-step fade-in">
+      <div class="step-num">01</div>
+      <div class="step-title">Get in touch</div>
+      <p class="step-desc">Drop me a message with what you need. I'll respond within 24 hours with questions or a proposal.</p>
+    </div>
+    <div class="process-step fade-in">
+      <div class="step-num">02</div>
+      <div class="step-title">Quick briefing</div>
+      <p class="step-desc">A brief message exchange to clarify scope, deadlines, access, and preferred way of working.</p>
+    </div>
+    <div class="process-step fade-in">
+      <div class="step-num">03</div>
+      <div class="step-title">I get to work</div>
+      <p class="step-desc">You'll have clear updates throughout. No chasing required — you'll always know where things stand.</p>
+    </div>
+    <div class="process-step fade-in">
+      <div class="step-num">04</div>
+      <div class="step-title">Delivered on time</div>
+      <p class="step-desc">Work completed to your standard, on schedule. Ongoing clients get a dedicated weekly check-in.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section style="padding: 6rem 4rem;">
+  <div id="contact">
+    <div class="section-label">Get in touch</div>
+    <h2 class="section-title fade-in">Ready to free up<br><em>your time?</em></h2>
+    <p class="contact-sub">Tell me what you need and I'll come back to you within 24 hours. No commitment required.</p>
+    <form class="contact-form" onsubmit="handleSubmit(event)">
+      <div class="form-row">
+        <input type="text" placeholder="Your name" required />
+        <input type="email" placeholder="Email address" required />
+      </div>
+      <select>
+        <option value="" disabled selected>Service you need</option>
+        <option>Inbox management</option>
+        <option>Calendar &amp; scheduling</option>
+        <option>Invoice &amp; admin support</option>
+        <option>Research &amp; data entry</option>
+        <option>Customer communication</option>
+        <option>Document support</option>
+        <option>Multiple / not sure yet</option>
+      </select>
+      <textarea placeholder="Tell me a bit about what you need and roughly how many hours per week..."></textarea>
+      <button type="submit" class="form-submit">Send enquiry</button>
+    </form>
+
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">A<span>.</span>E <span style="color:var(--muted)">Streamline</span></div>
+  <div class="footer-note">UK-Based Virtual Assistant &mdash; Remote &mdash; Available 20+ hrs/week</div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.form-submit');
+    btn.textContent = 'Message sent — I\'ll be in touch within 24 hours';
+    btn.style.background = '#2a5a3a';
+    btn.style.color = '#a8d5b5';
+    btn.disabled = true;
+  }
+</script>
+</body>
+</html>
